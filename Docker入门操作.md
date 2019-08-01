@@ -6,10 +6,10 @@
 
 # What is Docker？
 Docker是程序员在容器中开发、部署、运行应用的平台，这种使用容器来部署应用的方式可以成为容器化，可以发布到任意的Linux机器上。
+
 # Why Docker？
 
-# How to work with Docker?
-
+# Work with Docker
 ## 官方安装指南
 [Windows版本](https://docs.docker.com/docker-for-windows/install/)
 [Ubuntu版本](https://docs.docker.com/install/linux/docker-ee/ubuntu/)
@@ -39,7 +39,7 @@ Commands:
   commit      根据容器的修改创建新的镜像
   cp          本地文件系统及镜像之间的文件复制
   create      创建新的容器
-  diff        Inspect changes to files or directories on a container\'s filesystem
+  diff        Inspect changes to files or directories on a container's filesystem
   events      Get real time events from the server
   exec        在正在运行中的容器中执行命令
   export      将容器的文件系统导出打包
