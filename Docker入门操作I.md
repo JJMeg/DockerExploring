@@ -6,6 +6,7 @@
 
 # What is Docker？
 Docker是程序员在容器中开发、部署、运行应用的平台，这种使用容器来部署应用的方式可以成为容器化，可以发布到任意的Linux机器上。
+![avatar](https://cn.bing.com/images/search?view=detailV2&ccid=r%2fTVGEzJ&id=9044703AF9D7E1E5714880A23B5DA57C233AD0E9&thid=OIP.r_TVGEzJr8PWwEkt38YuDQHaFw&mediaurl=https%3a%2f%2fblog.docker.com%2fwp-content%2fuploads%2fillustration-com-container-party.png&exph=1167&expw=1500&q=docker&simid=608048659534185777&selectedIndex=18&ajaxhist=0)
 # Why Docker？
 - 隔离性好：沙箱机制，彼此间无接口，一个容器就是一个独立的环境，不与其他应用争夺系统资源，对系统资源的利用率高。
 - 快：与虚拟机技术不同，直接运行在宿主机内核上，不需要像虚拟机技术那样启动完整的操作系统，也因此占用磁盘空间少，节约系统资源，可秒级启动，内存消耗、磁盘读写速度都比虚拟机技术快。
@@ -100,6 +101,7 @@ root@201b7fb2c23c:/ws# 直接进入容器的工作空间，可以自由发挥了
 3. 停止容器
 ```bash
 # 列出正在运行的容器
+# 输出结果会包含容器ID、名称（运行时可以指定名称，否则docker会自动生成名称）、镜像等
 $ docker container ls
 CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES                
 659805d16ae3        java:latest         "/bin/bash"         About a minute ago   Up About a minute                       zen_ramanujan      
@@ -111,5 +113,20 @@ root@201b7fb2c23c:/ws# exit
 $ docker stop container [docker name]
 ```
 
-以上是一个简单的示例，这个示例中还可以用到的docker相关的命令有：
-- 进入到一个正在执行的容器：docker exec -it [CONTAINER ID] bash
+## 其他补充
+以上是一个简单的示例，该示例中还可以用到的docker相关的命令有：
+1. 进入到一个正在执行的容器的终端: docker exec -it [CONTAINER ID] bash
+2. 删除已经是终止状态的容器：docker rm [CONTAINER ID]
+3. 删除正在运行的容器：docker rm -f [CONTAINER ID]
+4. 删除所有停止的容器：docker container prune
+
+## docker中运行docker
+场景：公司给我配的电脑是ThinkPad（真不香），组里的项目是默认在类Unix系统下运行，我的电脑跑不起该项目。在踩过一些慢速大坑后，决定在docker内运行，当然docker内跑项目的效率比虚拟机高多了，但本项目中部分模块要用到docker，那么如何解决呢？
+- docker内运行docker，即将宿主机的Docker共享给容器，运行时需要添加的参数如下
+```bash
+--privileged # 给该容器赋予root权限，只有root用户才能执行docker命令
+-v /var/run/docker.sock:/var/run/docker.sock # socket文件映射
+-v $(which docker):/bin/docker # docker可执行文件映射
+```
+为什么会用到docker.sock文件？
+sock文件是Unix域套接字文件，docker在运行时启动的docker守护进程默认监听这个套接字，docker引擎用到的HTTP接口均可以通过这个套接字文件调用，做映射后，容器就可以监听套接字文件，也因此权限更加高，可以控制docker的守护进程，调用docker命令。
