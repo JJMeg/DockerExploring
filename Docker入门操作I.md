@@ -38,36 +38,30 @@ $ docker --help
   volume      管理volumes
 
 Commands:
-  attach      Attach local standard input, output, and error streams to a running container
   build       通过Dockerfile中的配置构建镜像
   commit      根据容器的修改创建新的镜像
   cp          本地文件系统及镜像之间的文件复制
   create      创建新的容器
-  diff        Inspect changes to files or directories on a container's filesystem
-  events      Get real time events from the server
   exec        在正在运行中的容器中执行命令
   export      将容器的文件系统导出打包
   history     展示镜像历史
-  images      List images
-  import      Import the contents from a tarball to create a filesystem image
-  info        Display system-wide information
-  inspect     Return low-level information on Docker objects
-  kill        Kill one or more running containers
-  load        Load an image from a tar archive or STDIN
+  images      列出所有镜像等同于命令：docker image list
+  kill        停止一个或多个正在运行的容器
+  load        导出用save命令打包导出的镜像
   login       登陆到Docker registry
   logout      登出Docker registry
   logs        获取容器的日志
   pause       暂停一个或多个容器中的所有进程
   port        列出容器的端口映射
   ps          列出所有容器
-  pull        从registry拉取镜像或仓库
+  pull        从镜像库拉取镜像
   push        推送镜像或仓库到registry
   rename      重命名容器
   restart     重启一个或多个容器
   rm          移除一个或多个容器
   rmi         移除一个或多个镜像
   run         在新容器中执行命令
-  save        将一个或多个镜像打包
+  save        将一个或多个镜像导出
   search      在Docker Hub中搜索镜像
   start       启动一个或多个镜像
   stats       Display a live stream of container(s) resource usage statistics
@@ -78,5 +72,44 @@ Commands:
   update      更新一个或多个容器的配置
   version     获取Docker版本信息
   wait        阻塞等待一个或多个容器停止，并输出退出码
+```
+
+## 4. 一个简单的示例
+> 拉镜像->配参数->运行容器->跑项目->停止容器
+
+1. 拉取镜像
+```bash
+$ docker pull java:latest
+$ docker image list
+REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
+java                       latest              d23bdf5b1b1b        2 years ago         643MB
+```
+
+2. 配置文件映射、工作目录等参数并运行容器
+```bash
+--workdir=/ws #设置容器内的工作空间
+--volume=/test:/ws #本地文件映射到工作空间--volume=本地路径:容器路径，注意：如果路径有空格，加上双引号->--volume="/test project":/ws
+-i #-i则让容器的标准输入保持打开
+-t #-t让docker分配一个伪终端并绑定到容器的标准输入上
+#最后指定要用到的镜像
+$ docker run --workdir=/ws --volume=/test:/ws -it java:latest
+root@201b7fb2c23c:/ws# 直接进入容器的工作空间，可以自由发挥了
 
 ```
+
+3. 停止容器
+```bash
+# 列出正在运行的容器
+$ docker container ls
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES                
+659805d16ae3        java:latest         "/bin/bash"         About a minute ago   Up About a minute                       zen_ramanujan      
+
+# 1. 可在容器中直接 exit 退出
+root@201b7fb2c23c:/ws# exit
+
+# 2. 也可用docker命令
+$ docker stop container [docker name]
+```
+
+以上是一个简单的示例，这个示例中还可以用到的docker相关的命令有：
+- 进入到一个正在执行的容器：docker exec -it [CONTAINER ID] bash
